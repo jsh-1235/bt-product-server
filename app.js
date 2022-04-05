@@ -5,7 +5,7 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var bodyParser = require("body-parser");
 var methodOverride = require("method-override");
-// const helmet = require("helmet");
+const helmet = require("helmet");
 const cors = require("cors");
 require("dotenv").config();
 
@@ -29,8 +29,15 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(methodOverride("_method"));
 app.use(bodyParser.urlencoded({ extended: true })); // Encode x-www-form-urlencoded
 app.use(bodyParser.json()); // Encode JSON format
+app.use(
+  cors({
+    // origin: ["http://localhost:3001", "https://localhost:3001"],
+    origin: true,
+    credentials: true,
+    exposedHeaders: ["set-cookie"],
+  })
+);
 // app.use(helmet());
-app.use(cors());
 
 //=======================================================================
 const mongoose = require("mongoose");

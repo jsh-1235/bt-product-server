@@ -34,7 +34,7 @@ app.use(
     // origin: ["http://localhost:3001", "https://localhost:3001"],
     origin: true, // reflect (enable) the requested origin in the CORS response
     credentials: true,
-    exposedHeaders: ["Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept", "Set-Cookie"],
+    // exposedHeaders: ["Set-Cookie"],
   })
 );
 // app.use(helmet());

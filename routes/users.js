@@ -149,9 +149,16 @@ router.post("/login", (req, res) => {
 
         // res.cookie("w_authExp", user.tokenExp, { httpOnly: true, maxAge: 60 * 1000 });
 
-        res.cookie("w_authExp", user.tokenExp, { domain: "bt-product-server.herokuapp.com", httpOnly: true });
+        // res.cookie("w_authExp", user.tokenExp, { domain: "bt-product-server.herokuapp.com", httpOnly: true });
 
-        res.cookie("w_auth", user.token, { domain: "bt-product-server.herokuapp.com", httpOnly: true }).status(200).json({
+        // res.cookie("w_auth", user.token, { domain: "bt-product-server.herokuapp.com", httpOnly: true }).status(200).json({
+        //   success: true,
+        //   userId: user._id,
+        // });
+
+        res.cookie("w_authExp", user.tokenExp);
+
+        res.cookie("w_auth", user.token).status(200).json({
           success: true,
           userId: user._id,
         });

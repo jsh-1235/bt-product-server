@@ -75,7 +75,7 @@ schema.methods.generateToken = function (cb) {
   const user = this;
 
   const token = jwt.sign({ id: user._id.toHexString() }, process.env.JWT_SECRET, {
-    expiresIn: "1m",
+    // expiresIn: "1m",
     issuer: "jsh",
   });
 

@@ -156,9 +156,9 @@ router.post("/login", (req, res) => {
         //   userId: user._id,
         // });
 
-        res.cookie("w_authExp", user.tokenExp, { httpOnly: true, sameSite: "None" });
+        res.cookie("w_authExp", user.tokenExp, { httpOnly: true, sameSite: "None", secure: true });
 
-        res.cookie("w_auth", user.token, { httpOnly: true, sameSite: "None" }).status(200).json({
+        res.cookie("w_auth", user.token, { httpOnly: true, sameSite: "None", secure: true }).status(200).json({
           success: true,
           userId: user._id,
         });

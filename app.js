@@ -29,16 +29,14 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(methodOverride("_method"));
 app.use(bodyParser.urlencoded({ extended: true })); // Encode x-www-form-urlencoded
 app.use(bodyParser.json()); // Encode JSON format
-// app.use(
-//   cors({
-//     // origin: ["http://localhost:3001", "https://localhost:3001"],
-//     origin: true, // reflect (enable) the requested origin in the CORS response
-//     credentials: true,
-//     exposedHeaders: ["set-cookie"],
-//   })
-// );
-app.use(cors());
-app.options("*", cors());
+app.use(
+  cors({
+    // origin: ["http://localhost:3001", "https://localhost:3001"],
+    origin: true, // reflect (enable) the requested origin in the CORS response
+    credentials: true,
+    exposedHeaders: ["Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept", "set-cookie"],
+  })
+);
 // app.use(helmet());
 
 //=======================================================================

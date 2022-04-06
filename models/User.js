@@ -4,6 +4,8 @@ const saltRounds = 10;
 const jwt = require("jsonwebtoken");
 const moment = require("moment");
 
+require("dotenv").config();
+
 const schema = mongoose.Schema({
   firstName: {
     type: String,
@@ -71,8 +73,13 @@ schema.methods.comparePassword = function (plainPassword, cb) {
 
 schema.methods.generateToken = function (cb) {
   const user = this;
-  const token = jwt.sign(user._id.toHexString(), "secret");
-  const oneHour = moment().add(1, "hour").valueOf();
+
+  const token = jwt.sign({ id: user._id.toHexString() }, process.env.JWT_SECRET, {
+    expiresIn: "1m",
+    issuer: "jsh",
+  });
+
+  const oneHour = moment().add(1, "minutes").valueOf();
 
   user.token = token;
   user.tokenExp = oneHour;
@@ -87,10 +94,12 @@ schema.methods.generateToken = function (cb) {
 schema.statics.findByToken = function (token, cb) {
   const user = this;
 
-  jwt.verify(token, "secret", function (err, decode) {
+  jwt.verify(token, process.env.JWT_SECRET, function (err, decoded) {
     if (err) return cb(err);
 
-    user.findOne({ _id: decode, token: token }, function (err, user) {
+    console.log("decoded", decoded);
+
+    user.findOne({ _id: decoded.id, token: token }, function (err, user) {
       if (err) return cb(err);
 
       cb(null, user);

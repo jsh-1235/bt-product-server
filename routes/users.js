@@ -5,18 +5,6 @@ const { User } = require("../models/User");
 const { auth } = require("../middleware/auth");
 
 /* GET users listing. */
-router.get("/", function (req, res, next) {
-  console.log(req.cookies);
-
-  User.find().exec((err, users) => {
-    if (err) {
-      return res.status(400).json({ success: false, err });
-    } else {
-      res.status(200).json({ success: true, users });
-    }
-  });
-});
-
 router.get("/auth", auth, (req, res) => {
   res.status(200).json({
     _id: req.user._id,
@@ -27,6 +15,18 @@ router.get("/auth", auth, (req, res) => {
     email: req.user.email,
     role: req.user.role,
     image: req.user.image,
+  });
+});
+
+router.get("/", auth, function (req, res, next) {
+  console.log(req.cookies);
+
+  User.find().exec((err, users) => {
+    if (err) {
+      return res.status(400).json({ success: false, err });
+    } else {
+      res.status(200).json({ success: true, users });
+    }
   });
 });
 
@@ -147,9 +147,10 @@ router.post("/login", (req, res) => {
 
         // console.log("comparePassword", user);
 
-        res.cookie("w_authExp", user.tokenExp);
+        // res.cookie("w_authExp", user.tokenExp, { httpOnly: true, maxAge: 60 * 1000 });
+        res.cookie("w_authExp", user.tokenExp, { httpOnly: true });
 
-        res.cookie("w_auth", user.token).status(200).json({
+        res.cookie("w_auth", user.token, { httpOnly: true }).status(200).json({
           success: true,
           userId: user._id,
         });

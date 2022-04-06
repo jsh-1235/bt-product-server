@@ -34,7 +34,7 @@ app.use(
     // origin: ["http://localhost:3001", "https://localhost:3001"],
     origin: true,
     credentials: true,
-    exposedHeaders: ["set-cookie"],
+    // exposedHeaders: ["set-cookie"],
   })
 );
 // app.use(helmet());

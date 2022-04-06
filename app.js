@@ -32,12 +32,18 @@ app.use(bodyParser.json()); // Encode JSON format
 app.use(
   cors({
     // origin: ["http://localhost:3001", "https://localhost:3001"],
-    origin: true,
+    origin: true, // reflect (enable) the requested origin in the CORS response
     credentials: true,
-    // exposedHeaders: ["set-cookie"],
+    exposedHeaders: ["set-cookie"],
   })
 );
 // app.use(helmet());
+
+app.all("/*", function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "X-Requested-With");
+  next();
+});
 
 //=======================================================================
 const mongoose = require("mongoose");

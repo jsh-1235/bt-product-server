@@ -148,9 +148,10 @@ router.post("/login", (req, res) => {
         // console.log("comparePassword", user);
 
         // res.cookie("w_authExp", user.tokenExp, { httpOnly: true, maxAge: 60 * 1000 });
-        res.cookie("w_authExp", user.tokenExp, { httpOnly: true });
 
-        res.cookie("w_auth", user.token, { httpOnly: true }).status(200).json({
+        res.cookie("w_authExp", user.tokenExp, { domain: "bt-product-server.herokuapp.com", httpOnly: true });
+
+        res.cookie("w_auth", user.token, { domain: "bt-product-server.herokuapp.com", httpOnly: true }).status(200).json({
           success: true,
           userId: user._id,
         });

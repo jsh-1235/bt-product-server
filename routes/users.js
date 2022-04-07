@@ -1,8 +1,13 @@
 var express = require("express");
 var router = express.Router();
 
-const { User } = require("../models/User");
 const { auth } = require("../middleware/auth");
+const { User } = require("../models/User");
+
+const ROLE = {
+  USER: 0,
+  ADMIN: 1,
+};
 
 /* GET users listing. */
 router.get("/auth", auth, (req, res) => {
@@ -18,26 +23,12 @@ router.get("/auth", auth, (req, res) => {
   });
 });
 
-router.get("/", auth, function (req, res, next) {
-  console.log(req.cookies);
-
-  User.find().exec((err, users) => {
-    if (err) {
-      return res.status(400).json({ success: false, err });
-    } else {
-      res.status(200).json({ success: true, users });
-    }
-  });
-});
-
 router.post("/register", (req, res) => {
-  // console.log(req.body);
-
   User.findOne({ email: req.body.email }, function (err, user) {
     if (err) return cb(err);
 
     if (user) {
-      return res.json({ success: false, err: "You are already a registered user." });
+      return res.json({ success: false, err: "The user is already registered." });
     } else {
       const user = new User(req.body);
 
@@ -56,81 +47,81 @@ router.post("/register", (req, res) => {
   });
 });
 
-router.post("/update", (req, res) => {
-  console.log(req.body);
+router.post("/update", auth, (req, res) => {
+  if (req.user.role === ROLE.ADMIN) {
+    User.findOne({ _id: req.body._id }, (err, user) => {
+      if (!user) {
+        return res.json({
+          success: false,
+          err: "Authentication failed, user not found.",
+        });
+      }
 
-  User.findOne({ email: req.body.email }, (err, user) => {
-    if (!user) {
-      return res.json({
-        success: false,
-        err: "Authentication failed, Email not found.",
-      });
-    }
+      user.comparePassword(req.body.password, (err, isMatch) => {
+        if (!isMatch) return res.json({ success: false, err: "Authentication failed, Wrong password." });
 
-    user.comparePassword(req.body.password, (err, isMatch) => {
-      if (!isMatch) return res.json({ success: false, err: "Authentication failed, Wrong password." });
+        user.email = req.body.email;
+        user.firstName = req.body.firstName;
+        user.lastName = req.body.lastName;
 
-      user.firstName = req.body.firstName;
-      user.lastName = req.body.lastName;
+        user.save(function (err) {
+          if (err) return res.json({ success: false, err: err.message });
 
-      user.save(function (err) {
-        if (err) return res.json({ success: false, err: err.message });
-
-        return res.status(200).json({
-          success: true,
+          return res.status(200).json({
+            success: true,
+          });
         });
       });
     });
-  });
+  } else {
+    const err = new Error("You do not have access rights.");
+    err.status = 403;
+    return next(err);
+  }
 });
 
-// router.post("/delete", auth, (req, res, next) => {
-//   console.log(req.cookies.w_auth);
+router.get("/", auth, function (req, res, next) {
+  // console.log(req.cookies, req.user.role);
 
-//   User.deleteOne({ token: req.cookies.w_auth }, (err, user) => {
-//     if (err) next(err);
-
-//     if (!user) {
-//       return res.json({
-//         success: false,
-//         err: "Failed to delete user from db.",
-//       });
-//     }
-
-//     res.clearCookie("w_authExp");
-//     res.clearCookie("w_auth");
-
-//     return res.status(200).json({
-//       success: true,
-//     });
-//   });
-// });
-
-router.post("/delete", (req, res, next) => {
-  console.log(req.method, req.url, req.body._id);
-
-  User.deleteOne({ _id: req.body._id }, (err, user) => {
-    if (err) next(err);
-
-    if (!user) {
-      return res.json({
-        success: false,
-        err: "Failed to delete user from db.",
-      });
-    }
-
-    res.clearCookie("w_authExp");
-    res.clearCookie("w_auth");
-
-    return res.status(200).json({
-      success: true,
+  if (req.user.role === ROLE.ADMIN) {
+    User.find().exec((err, users) => {
+      if (err) {
+        return res.status(400).json({ success: false, err });
+      } else {
+        res.status(200).json({ success: true, users });
+      }
     });
-  });
+  } else {
+    const err = new Error("You do not have access rights.");
+    err.status = 403;
+    return next(err);
+  }
+});
+
+router.post("/delete", auth, (req, res, next) => {
+  if (req.user.role === ROLE.ADMIN) {
+    User.deleteOne({ _id: req.body._id }, (err, result) => {
+      if (err) next(err);
+
+      if (result.deletedCount === 0) {
+        return res.json({
+          success: false,
+          err: "Failed to delete user from db.",
+        });
+      } else {
+        return res.status(200).json({
+          success: true,
+        });
+      }
+    });
+  } else {
+    const err = new Error("You do not have access rights.");
+    err.status = 403;
+    return next(err);
+  }
 });
 
 router.post("/login", (req, res) => {
-  console.log(req.body);
-
   User.findOne({ email: req.body.email }, (err, user) => {
     if (!user) {
       return res.json({
@@ -153,14 +144,19 @@ router.post("/login", (req, res) => {
           success: true,
           userId: user._id,
         });
+
+        // res.cookie("w_authExp", user.tokenExp, { httpOnly: true });
+
+        // res.cookie("w_auth", user.token, { httpOnly: true }).status(200).json({
+        //   success: true,
+        //   userId: user._id,
+        // });
       });
     });
   });
 });
 
 router.get("/logout", auth, (req, res) => {
-  console.log("logout");
-
   User.findOneAndUpdate({ _id: req.user._id }, { token: "", tokenExp: "" }, (err, doc) => {
     if (err) return res.json({ success: false, err: "Logout failed." });
 

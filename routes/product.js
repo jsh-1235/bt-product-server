@@ -70,21 +70,31 @@ router.post("/update", auth, (req, res) => {
   }
 });
 
-router.get("/", auth, function (req, res, next) {
-  if (req.user.role >= ROLE.USER) {
-    Product.find().exec((err, products) => {
-      if (err) {
-        return res.status(400).json({ success: false, err });
-      } else {
-        res.status(200).json({ success: true, products });
-      }
-    });
-  } else {
-    return res.json({
-      success: false,
-      err: "Log in with administrator privileges.",
-    });
-  }
+// router.get("/", auth, function (req, res, next) {
+//   if (req.user.role >= ROLE.USER) {
+//     Product.find().exec((err, products) => {
+//       if (err) {
+//         return res.status(400).json({ success: false, err });
+//       } else {
+//         res.status(200).json({ success: true, products });
+//       }
+//     });
+//   } else {
+//     return res.json({
+//       success: false,
+//       err: "Log in with administrator privileges.",
+//     });
+//   }
+// });
+
+router.get("/", function (req, res, next) {
+  Product.find().exec((err, products) => {
+    if (err) {
+      return res.status(400).json({ success: false, err });
+    } else {
+      res.status(200).json({ success: true, products });
+    }
+  });
 });
 
 router.get("/:id", auth, function (req, res, next) {

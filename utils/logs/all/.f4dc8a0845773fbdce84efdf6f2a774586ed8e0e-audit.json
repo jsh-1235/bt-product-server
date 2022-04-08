@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": false,
+        "amount": 7
+    },
+    "auditLog": "C:\\Products\\Software Devlopment\\Web\\BT\\Server\\bt-product-server\\utils\\logs\\all\\.f4dc8a0845773fbdce84efdf6f2a774586ed8e0e-audit.json",
+    "files": [
+        {
+            "date": 1649408887935,
+            "name": "C:\\Products\\Software Devlopment\\Web\\BT\\Server\\bt-product-server\\utils\\logs\\all\\2022-04-08.all.log",
+            "hash": "99c46b7c61e3e2beb026392cce669625"
+        }
+    ],
+    "hashType": "md5"
+}

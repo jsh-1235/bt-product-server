@@ -9,6 +9,9 @@ const helmet = require("helmet");
 const cors = require("cors");
 require("dotenv").config();
 
+var fs = require("fs");
+var { dataLogger, stream } = require("./utils/dataLogger");
+
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var productRouter = require("./routes/product");
@@ -19,7 +22,16 @@ var app = express();
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
 
+// app.use(logger("dev", { stream }));
+
 app.use(logger("dev"));
+
+// app.use(
+//   logger("combined", {
+//     stream: fs.createWriteStream(path.join(__dirname, "access.log"), { flags: "a" }),
+//   })
+// );
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -43,11 +55,15 @@ app.use(
 const mongoose = require("mongoose");
 const config = require("./config/key");
 
-console.log(process.env.NODE_ENV, process.env.DATABASE_NAME);
+// dataLogger.error(`${process.env.NODE_ENV} ${process.env.DATABASE_NAME}`);
+// dataLogger.warn(`${process.env.NODE_ENV} ${process.env.DATABASE_NAME}`);
+// dataLogger.info(`${process.env.NODE_ENV} ${process.env.DATABASE_NAME}`);
+// dataLogger.http(`${process.env.NODE_ENV} ${process.env.DATABASE_NAME}`);
+// dataLogger.debug(`${process.env.NODE_ENV} ${process.env.DATABASE_NAME}`);
 
 mongoose
   .connect(config.mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('Successfully connected to "%s"', config.mongoURI))
+  .then(() => dataLogger.info(`Successfully connected to ${config.mongoURI}`))
   .catch((err) => console.log(err));
 
 //=======================================================================

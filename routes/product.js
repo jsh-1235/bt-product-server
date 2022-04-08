@@ -1,6 +1,8 @@
 var express = require("express");
 var router = express.Router();
 
+var { dataLogger } = require("../utils/dataLogger");
+
 const { auth } = require("../middleware/auth");
 const { Product } = require("../models/Product");
 
@@ -90,8 +92,12 @@ router.post("/update", auth, (req, res) => {
 router.get("/", function (req, res, next) {
   Product.find().exec((err, products) => {
     if (err) {
+      dataLogger.error(err);
+
       return res.status(400).json({ success: false, err });
     } else {
+      dataLogger.http(products);
+
       res.status(200).json({ success: true, products });
     }
   });

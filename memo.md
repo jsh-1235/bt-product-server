@@ -24,6 +24,7 @@
 - npm install jsonwebtoken
 - npm install moment
 - npm install async
+- npm instal winston winston-daily-rotate-file date-utils
 
 ```json
  "scripts": {
